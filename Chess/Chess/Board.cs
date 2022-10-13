@@ -6,10 +6,9 @@ namespace Chess
 {
     class Board
     {
-        string tileEmpty = "[ ]";
         const int length = 8;
         const int width = 8;
-        string[,] tiles = new string[length, width];
+        Tile[,] tiles = new Tile[length, width];
 
         public Board()
         {
@@ -21,7 +20,7 @@ namespace Chess
             {
                 for (int j = 0; j < width; j++)
                 {
-                    tiles[i, j] = tileEmpty;
+                    tiles[i, j] = new Tile();
                 }
             }
         }
@@ -32,7 +31,7 @@ namespace Chess
             {
                 for (int j = 0; j < width; j++)
                 {
-                    Console.Write(tiles[i, j]);
+                    Console.Write(tiles[i, j].getTileIcon());
                 }
                 Console.Write("\n");
             }
