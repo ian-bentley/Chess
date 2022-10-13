@@ -1,0 +1,14 @@
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.exe
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.deps.json
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.runtimeconfig.json
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.runtimeconfig.dev.json
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.dll
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\bin\Debug\netcoreapp3.1\Chess.pdb
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.csproj.AssemblyReference.cache
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.AssemblyInfoInputs.cache
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.AssemblyInfo.cs
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.csproj.CoreCompileInputs.cache
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.dll
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.pdb
+C:\Users\ibentley\OneDrive - Anchor General Insurance Agency, Inc\Documents\GitHub Repositories\Chess\Chess\Chess\obj\Debug\netcoreapp3.1\Chess.genruntimeconfig.cache
