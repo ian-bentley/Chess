@@ -56,5 +56,11 @@ namespace Chess
                     break;
             }
         }
+
+        public void MoveTo(Tile tile)
+        {
+            tile.OccupyingPiece = this;
+            OccupiedTile = tile;
+        }
     }
 }
