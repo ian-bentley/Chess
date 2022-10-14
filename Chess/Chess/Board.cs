@@ -8,10 +8,16 @@ namespace Chess
     {
         const int length = 8;
         const int width = 8;
-        Tile[,] tiles = new Tile[length, width];
+
+        public Tile[,] Tiles
+        {
+            get;
+            private set;
+        }
 
         public Board()
         {
+            Tiles = new Tile[length, width];
             Fill();
         }
         void Fill()
@@ -20,7 +26,9 @@ namespace Chess
             {
                 for (int j = 0; j < width; j++)
                 {
-                    tiles[i, j] = new Tile();
+                    Tiles[i, j] = new Tile();
+                    Tiles[i, j].Position.X = j;
+                    Tiles[i, j].Position.Y = i;
                 }
             }
         }
@@ -31,7 +39,7 @@ namespace Chess
             {
                 for (int j = 0; j < width; j++)
                 {
-                    Console.Write(tiles[i, j].getTileIcon());
+                    Console.Write(Tiles[i, j].getTileIcon());
                 }
                 Console.Write("\n");
             }

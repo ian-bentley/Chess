@@ -19,6 +19,12 @@ namespace Chess
             private set;
         }
 
+        public Tile OccupiedTile
+        {
+            get;
+            set;
+        }
+
         public Piece()
         {
             PieceType = PieceType.Null;

@@ -6,18 +6,34 @@ namespace Chess
 {
     class Tile
     {
-        Piece occupyingPiece;
-        string tileEmptyIcon = "[ ]";
+        const string tileEmptyIcon = "[ ]";
+        public Position Position
+        {
+            get;
+            private set;
+        }
+        
+        public Piece OccupyingPiece
+        {
+            get;
+            set;
+        }
+
+        public Tile()
+        {
+            Position = new Position();
+        }
+        
         public string getTileIcon()
         {
             string tileIcon;
-            if (occupyingPiece == null)
+            if (OccupyingPiece == null)
             {
                 tileIcon = tileEmptyIcon;
             }
             else
             {
-                tileIcon = occupyingPiece.TileIcon;
+                tileIcon = OccupyingPiece.TileIcon;
             }
             return tileIcon;
         }
