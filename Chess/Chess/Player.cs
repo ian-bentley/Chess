@@ -95,22 +95,22 @@ namespace Chess
 
         public Player(Board board)
         {
-            QueenRook = new Piece(PieceType.Rook);
-            KingRook = new Piece(PieceType.Rook);
-            QueenKnight = new Piece(PieceType.Knight);
-            KingKnight = new Piece(PieceType.Knight);
-            QueenBishop = new Piece(PieceType.Bishop);
-            KingBishop = new Piece(PieceType.Bishop);
-            Queen = new Piece(PieceType.Queen);
-            King = new Piece(PieceType.King);
-            APawn = new Piece(PieceType.Pawn);
-            BPawn = new Piece(PieceType.Pawn);
-            CPawn = new Piece(PieceType.Pawn);
-            DPawn = new Piece(PieceType.Pawn);
-            EPawn = new Piece(PieceType.Pawn);
-            FPawn = new Piece(PieceType.Pawn);
-            GPawn = new Piece(PieceType.Pawn);
-            HPawn = new Piece(PieceType.Pawn);
+            QueenRook = new Piece(PieceType.Rook, "Queen Rook");
+            KingRook = new Piece(PieceType.Rook, "King Rook");
+            QueenKnight = new Piece(PieceType.Knight, "Queen Knight");
+            KingKnight = new Piece(PieceType.Knight, "King Knight");
+            QueenBishop = new Piece(PieceType.Bishop, "Queen Bishop");
+            KingBishop = new Piece(PieceType.Bishop, "King Bishop");
+            Queen = new Piece(PieceType.Queen, "Queen");
+            King = new Piece(PieceType.King, "King");
+            APawn = new Piece(PieceType.Pawn, "A-Pawn");
+            BPawn = new Piece(PieceType.Pawn, "B-Pawn");
+            CPawn = new Piece(PieceType.Pawn, "C-Pawn");
+            DPawn = new Piece(PieceType.Pawn, "D-Pawn");
+            EPawn = new Piece(PieceType.Pawn, "E-Pawn");
+            FPawn = new Piece(PieceType.Pawn, "F-Pawn");
+            GPawn = new Piece(PieceType.Pawn, "G-Pawn");
+            HPawn = new Piece(PieceType.Pawn, "H-Pawn");
 
             Board = board;
 

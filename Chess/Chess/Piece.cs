@@ -13,6 +13,12 @@ namespace Chess
             private set;
         }
 
+        public string Name
+        {
+            get;
+            private set;
+        }
+
         public string TileIcon
         {
             get;
@@ -31,9 +37,11 @@ namespace Chess
             TileIcon = "[ ]";
         }
 
-        public Piece(PieceType pieceType)
+        public Piece(PieceType pieceType, string name)
         {
             PieceType = pieceType;
+            Name = name;
+
             switch(PieceType)
             {
                 case PieceType.Pawn:
