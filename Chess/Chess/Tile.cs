@@ -6,7 +6,8 @@ namespace Chess
 {
     class Tile
     {
-        const string tileEmptyIcon = "[ ]";
+        const string tileEmptyIcon = " ";
+
         public Position Position
         {
             get;

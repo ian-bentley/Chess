@@ -8,6 +8,8 @@ namespace Chess
     {
         static void Main(string[] args)
         {
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.Clear();
             Board board = new Board();
             Player player = new Player(board);
             board.Draw();
@@ -95,7 +97,7 @@ namespace Chess
                     {
                         Piece selectedPiece = board.Tiles[coordinateY, coordinateX].OccupyingPiece;
 
-                        Console.WriteLine("You select the " + selectedPiece.Name);
+                        Console.WriteLine("You selected the " + selectedPiece.Name);
                     }
                 }
                     

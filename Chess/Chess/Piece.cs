@@ -45,22 +45,22 @@ namespace Chess
             switch(PieceType)
             {
                 case PieceType.Pawn:
-                    TileIcon = "[P]";
+                    TileIcon = "P";
                     break;
                 case PieceType.Rook:
-                    TileIcon = "[R]";
+                    TileIcon = "R";
                     break;
                 case PieceType.Knight:
-                    TileIcon = "[N]";
+                    TileIcon = "N";
                     break;
                 case PieceType.Bishop:
-                    TileIcon = "[B]";
+                    TileIcon = "B";
                     break;
                 case PieceType.Queen:
-                    TileIcon = "[Q]";
+                    TileIcon = "Q";
                     break;
                 case PieceType.King:
-                    TileIcon = "[K]";
+                    TileIcon = "K";
                     break;
             }
         }
