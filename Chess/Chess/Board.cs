@@ -48,9 +48,16 @@ namespace Chess
                 }
                 Console.Write("\n");
             }
-            
+
             string columnLabels = "   a  b  c  d  e  f  g  h";
             Console.WriteLine(columnLabels);
+        }
+
+        public Tile tileAt(Coordinate coordinate)
+        {
+            Tile tile;
+            tile = Tiles[coordinate.y, coordinate.x];
+            return tile;
         }
     }
 }
