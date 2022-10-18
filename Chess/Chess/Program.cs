@@ -54,11 +54,13 @@ namespace Chess
                 catch (InvalidCoordinateInput ex)
                 {
                     Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
+                    Console.Write("Press any key to continue...");
                     Console.ReadKey();
                 }
                 catch (NoPieceOnTile ex)
                 {
                     Console.WriteLine("No piece is on " + "\"" + ex.InputString + "\"");
+                    Console.Write("Press any key to continue...");
                     Console.ReadKey();
                 }
             }
