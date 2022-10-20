@@ -119,22 +119,22 @@ namespace Chess
 
         public void SetUpPieces()
         {
-            QueenRook.MoveTo(Board.Tiles[7,0]);
-            QueenKnight.MoveTo(Board.Tiles[7,1]);
-            QueenBishop.MoveTo(Board.Tiles[7,2]);
-            Queen.MoveTo(Board.Tiles[7,3]);
-            King.MoveTo(Board.Tiles[7,4]);
-            KingBishop.MoveTo(Board.Tiles[7,5]);
-            KingKnight.MoveTo(Board.Tiles[7,6]);
-            KingRook.MoveTo(Board.Tiles[7,7]);
-            APawn.MoveTo(Board.Tiles[6,0]);
-            BPawn.MoveTo(Board.Tiles[6,1]);
-            CPawn.MoveTo(Board.Tiles[6,2]);
-            DPawn.MoveTo(Board.Tiles[6,3]);
-            EPawn.MoveTo(Board.Tiles[6,4]);
-            FPawn.MoveTo(Board.Tiles[6,5]);
-            GPawn.MoveTo(Board.Tiles[6,6]);
-            HPawn.MoveTo(Board.Tiles[6,7]);
+            QueenRook.Set(Board.QueenRookStartTile);
+            QueenKnight.Set(Board.QueenKnightStartTile);
+            QueenBishop.Set(Board.QueenBishopStartTile);
+            Queen.Set(Board.QueenStartTile);
+            King.Set(Board.KingStartTile);
+            KingBishop.Set(Board.KingBishopStartTile);
+            KingKnight.Set(Board.KingKnightStartTile);
+            KingRook.Set(Board.KingRookStartTile);
+            APawn.Set(Board.APawnStartTile);
+            BPawn.Set(Board.BPawnStartTile);
+            CPawn.Set(Board.CPawnStartTile);
+            DPawn.Set(Board.DPawnStartTile);
+            EPawn.Set(Board.EPawnStartTile);
+            FPawn.Set(Board.FPawnStartTile);
+            GPawn.Set(Board.GPawnStartTile);
+            HPawn.Set(Board.HPawnStartTile);
         }
     }
 }

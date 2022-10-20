@@ -25,16 +25,16 @@ namespace Chess
             private set;
         }
 
-        public Tile OccupiedTile
+        public bool HasMoved
         {
             get;
             set;
         }
 
-        public Piece()
+        public Tile OccupiedTile
         {
-            PieceType = PieceType.Null;
-            TileIcon = "[ ]";
+            get;
+            set;
         }
 
         public Piece(PieceType pieceType, string name)
@@ -63,9 +63,21 @@ namespace Chess
                     TileIcon = "K";
                     break;
             }
+
+            HasMoved = false;
         }
 
         public void MoveTo(Tile tile)
+        {
+            if (!HasMoved)
+            {
+                HasMoved = true;
+            }
+            tile.OccupyingPiece = this;
+            OccupiedTile = tile;
+        }
+
+        public void Set(Tile tile)
         {
             tile.OccupyingPiece = this;
             OccupiedTile = tile;

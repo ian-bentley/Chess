@@ -4,66 +4,120 @@ using System.Text;
 
 namespace Chess
 {
+    enum GameState { Start, PlayerTurn, Close }
+    enum TurnState { SelectingPiece, SelectingMove, TurnOver }
     class Program
     {
         static Board board = new Board();
         static Player player = new Player(board);
+        static GameState gameState = GameState.Start;
+        static string exitCommand = "-99";
+        static string backCommand = "-1";
         static void Main(string[] args)
         {
             Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.Clear();
             board.Draw();
 
-            while (true)
+            while (gameState != GameState.Close)
             {
                 Console.Clear();
                 board.Draw();
-                string selectedTileString = GetInput("Select a piece: ");
                 
-                if (selectedTileString == "-1")
+                switch (gameState)
                 {
-                    Console.WriteLine("Closing app...");
-                    break;
-                }
+                    case GameState.Start:
+                        gameState = GameState.PlayerTurn;
+                        break;
+                    case GameState.PlayerTurn:
+                        TurnState turnState = TurnState.SelectingPiece;
+                        Tile selectedTile = new Tile();
+                        Piece selectedPiece = new Piece();
 
-                try
-                {
-                    Coordinate coordinate;
-                    coordinate = ToCoordinate(selectedTileString);
+                        while (turnState == TurnState.SelectingPiece)
+                        {
+                            Console.Clear();
+                            board.Draw();
+                            string selectedTileString = GetInput("Select a piece: ");
 
-                    Tile selectedTile = board.tileAt(ToCoordinate(selectedTileString));
+                            if (selectedTileString == exitCommand)
+                            {
+                                turnState = TurnState.TurnOver;
+                                gameState = GameState.Close;
+                                continue;
+                            }
 
-                    if (selectedTile.OccupyingPiece != null)
-                    {
-                        Piece selectedPiece = selectedTile.OccupyingPiece;
-                        Console.WriteLine("You selected the " + selectedPiece.Name);
+                            try
+                            {
+                                selectedTile = board.tileAt(ToCoordinate(selectedTileString));
 
-                        string moveString = GetInput("Enter your move: ");
+                                if (selectedTile.OccupyingPiece != null)
+                                {
+                                    turnState = TurnState.SelectingMove;
+                                }
+                                else
+                                {
+                                    throw new NoPieceOnTile(selectedTileString);
+                                }
+                            }
+                            catch (InvalidCoordinateInput ex)
+                            {
+                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
+                                Console.Write("Press any key to continue...");
+                                Console.ReadKey();
+                            }
+                            catch (NoPieceOnTile ex)
+                            {
+                                Console.WriteLine("No piece is on " + "\"" + ex.InputString + "\"");
+                                Console.Write("Press any key to continue...");
+                                Console.ReadKey();
+                            }
+                        }
 
-                        selectedPiece.MoveTo(selectedTile);
+                        while (turnState == TurnState.SelectingMove)
+                        {
+                            selectedPiece = selectedTile.OccupyingPiece;
 
-                        Tile moveTile = board.tileAt(ToCoordinate(moveString));
-                        selectedTile.OccupyingPiece = null;
-                        selectedPiece.MoveTo(moveTile);
-                    }
-                    else
-                    {
-                        throw new NoPieceOnTile(selectedTileString);
-                    }
-                }
-                catch (InvalidCoordinateInput ex)
-                {
-                    Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey();
-                }
-                catch (NoPieceOnTile ex)
-                {
-                    Console.WriteLine("No piece is on " + "\"" + ex.InputString + "\"");
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey();
+                            Console.Clear();
+                            board.Draw();
+                            Console.WriteLine("You selected the " + selectedPiece.Name);
+                            string moveString = GetInput("Enter your move: ");
+
+                            if (moveString == backCommand)
+                            {
+                                turnState = TurnState.SelectingPiece;
+                                continue;
+                            }
+
+                            try
+                            {
+                                Tile moveTile = board.tileAt(ToCoordinate(moveString));
+                                if (isValidMove(moveTile, selectedPiece))
+                                {
+                                    selectedTile.OccupyingPiece = null;
+                                    selectedPiece.MoveTo(moveTile);
+                                    turnState = TurnState.TurnOver;
+                                }
+                            }
+                            catch (InvalidCoordinateInput ex)
+                            {
+                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
+                                Console.Write("Press any key to continue...");
+                                Console.ReadKey();
+                            }
+                            catch (InvalidMove ex)
+                            {
+                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid move");
+                                Console.Write("Press any key to continue...");
+                                Console.ReadKey();
+                            }
+                        }
+                        break;
                 }
             }
+
+            // Close app
+            Console.WriteLine("Closing app...");
         }
 
         static string GetInput (string prompt)
@@ -148,6 +202,32 @@ namespace Chess
             else
             {
                 throw new InvalidCoordinateInput(input);
+            }
+        }
+
+        static bool isValidMove(Tile moveTile, Piece selectedPiece)
+        {
+            List<Tile> possibleMoveTiles = new List<Tile>();
+            List<Tile> validMoveTiles = new List<Tile>();
+
+            switch (selectedPiece.PieceType)
+            {
+                case PieceType.Pawn:
+                    if (!selectedPiece.HasMoved)
+                    {
+                        //store possible moves
+                    }
+                    break;
+                case PieceType.Rook:
+                    break;
+                case PieceType.Knight:
+                    break;
+                case PieceType.Bishop:
+                    break;
+                case PieceType.Queen:
+                    break;
+                case PieceType.King:
+                    break;
             }
         }
     }
