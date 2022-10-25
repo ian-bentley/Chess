@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Chess
 {
-    enum PieceType { Pawn, Rook, Knight, Bishop, Queen, King, Null };
-    class Piece
+    public enum PieceType { Pawn, Rook, Knight, Bishop, Queen, King, Null };
+    public class Piece
     {
         public PieceType PieceType
         {
@@ -37,6 +37,8 @@ namespace Chess
             set;
         }
 
+        public Piece() : this(PieceType.Null, "") { }
+
         public Piece(PieceType pieceType, string name)
         {
             PieceType = pieceType;
@@ -61,6 +63,9 @@ namespace Chess
                     break;
                 case PieceType.King:
                     TileIcon = "K";
+                    break;
+                default:
+                    TileIcon = " ";
                     break;
             }
 

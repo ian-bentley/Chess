@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chess
 {
-    class Tile
+    public class Tile
     {
         const string tileEmptyIcon = " ";
 
@@ -37,6 +37,18 @@ namespace Chess
                 tileIcon = OccupyingPiece.TileIcon;
             }
             return tileIcon;
+        }
+
+        public bool isOccupied()
+        {
+            if (OccupyingPiece == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

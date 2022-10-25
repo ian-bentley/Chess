@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chess
 {
-    class Position
+    public class Position
     {
         public int X
         {

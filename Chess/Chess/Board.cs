@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chess
 {
-    class Board
+    public class Board
     {
         const int length = 8;
         const int width = 8;
@@ -171,5 +171,21 @@ namespace Chess
             tile = Tiles[coordinate.y, coordinate.x];
             return tile;
         }
+
+        public Tile tileAt(int x, int y)
+        {
+            Tile tile;
+            if (x < 0 || x > width || y < 0 || y > length)
+            {
+                throw new TileOutOfBounds(x, y);
+            }
+            tile = Tiles[y, x];
+            return tile;
+        }
+
+        /*public bool isPathClear(Tile startTile, Tile endTile)
+        {
+            
+        }*/
     }
 }

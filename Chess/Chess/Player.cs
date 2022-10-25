@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Chess
 {
-    class Player
+    public class Player
     {
         public Piece QueenRook
         {

@@ -6,7 +6,7 @@ namespace Chess
 {
     enum GameState { Start, PlayerTurn, Close }
     enum TurnState { SelectingPiece, SelectingMove, TurnOver }
-    class Program
+    public class Program
     {
         static Board board = new Board();
         static Player player = new Player(board);
@@ -97,6 +97,10 @@ namespace Chess
                                     selectedTile.OccupyingPiece = null;
                                     selectedPiece.MoveTo(moveTile);
                                     turnState = TurnState.TurnOver;
+                                }
+                                else
+                                {
+                                    throw new InvalidMove(moveString);
                                 }
                             }
                             catch (InvalidCoordinateInput ex)
@@ -215,31 +219,79 @@ namespace Chess
                 case PieceType.Pawn:
                     if (!selectedPiece.HasMoved)
                     {
-                        //store possible moves
+                        // store extra move in possible move tiles
+                        try
+                        {
+                            possibleMoveTiles.Add(board.tileAt(selectedPiece.OccupiedTile.Position.X, selectedPiece.OccupiedTile.Position.Y - 2));
+                        }
+                        catch (TileOutOfBounds ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }
-                    break;
+                    //store possible moves
+                    try
+                    {
+                        possibleMoveTiles.Add(board.tileAt(selectedPiece.OccupiedTile.Position.X, selectedPiece.OccupiedTile.Position.Y - 1));
+                    }
+                    catch (TileOutOfBounds ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    foreach(Tile t in possibleMoveTiles)
+                    {
+                        /*if (!t.isOccupied() && board.isPathClear(selectedPiece.OccupiedTile, t))
+                        {
+                            validMoveTiles.Add(t);
+                        }*/
+
+                        if (!t.isOccupied())
+                        {
+                            validMoveTiles.Add(t);
+                        }
+                    }
+
+                    if (validMoveTiles.Count == 0)
+                    {
+                        return false;
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
+                    // moveTile is not a valid move
+                    return false;
+
                 case PieceType.Rook:
-                    break;
+                    return false;
                 case PieceType.Knight:
-                    break;
+                    return false;
                 case PieceType.Bishop:
-                    break;
+                    return false;
                 case PieceType.Queen:
-                    break;
+                    return false;
                 case PieceType.King:
-                    break;
+                    return false;
+                default:
+                    return false;
             }
         }
     }
 
-    struct Coordinate
+    public struct Coordinate
     {
         public int x;
         public int y;
     }
 
     [Serializable]
-    class InvalidCoordinateInput : Exception
+    public class InvalidCoordinateInput : Exception
     {
         public string InputString
         {
@@ -252,8 +304,21 @@ namespace Chess
         }
     }
 
+    public class InvalidMove : Exception
+    {
+        public string InputString
+        {
+            get;
+            private set;
+        }
+        public InvalidMove(string input)
+        {
+            InputString = input;
+        }
+    }
+
     [Serializable]
-    class NoPieceOnTile : Exception
+    public class NoPieceOnTile : Exception
     {
         public string InputString
         {
@@ -264,6 +329,21 @@ namespace Chess
         public NoPieceOnTile(string input)
         {
             InputString = input;
+        }
+    }
+
+    [Serializable]
+    public class TileOutOfBounds : Exception
+    { 
+        public string Message
+        {
+            get;
+            private set;
+        }
+
+        public TileOutOfBounds(int x, int y)
+        {
+            Message = "Tile at (" + x + ", " + y + ") is out of bounds";
         }
     }
 }
