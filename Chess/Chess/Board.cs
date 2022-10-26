@@ -6,8 +6,15 @@ namespace Chess
 {
     public class Board
     {
-        const int length = 8;
-        const int width = 8;
+        public int Length 
+        {
+            get { return 8; }
+        }
+
+        public int Width
+        {
+            get { return 8; }
+        }
 
         public Tile[,] Tiles
         {
@@ -112,7 +119,7 @@ namespace Chess
 
         public Board()
         {
-            Tiles = new Tile[length, width];
+            Tiles = new Tile[Length, Width];
             Fill();
 
             QueenRookStartTile = Tiles[7, 0];
@@ -134,9 +141,9 @@ namespace Chess
         }
         void Fill()
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < Length; i++)
             {
-                for (int j = 0; j < width; j++)
+                for (int j = 0; j < Width; j++)
                 {
                     Tiles[i, j] = new Tile();
                     Tiles[i, j].Position.X = j;
@@ -147,12 +154,12 @@ namespace Chess
 
         public void Draw()
         {
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 int rowNumber = 8 - i;
                 Console.Write(rowNumber + " ");
 
-                for (int j = 0; j < width; j++)
+                for (int j = 0; j < Width; j++)
                 {
                     Console.Write("[");
                     Console.Write(Tiles[i, j].getTileIcon());
@@ -165,27 +172,30 @@ namespace Chess
             Console.WriteLine(columnLabels);
         }
 
-        public Tile tileAt(Coordinate coordinate)
+        public Tile tileAt(Position position)
         {
             Tile tile;
-            tile = Tiles[coordinate.y, coordinate.x];
+            tile = Tiles[position.Y, position.X];
             return tile;
         }
 
         public Tile tileAt(int x, int y)
         {
             Tile tile;
-            if (x < 0 || x > width || y < 0 || y > length)
-            {
-                throw new TileOutOfBounds(x, y);
-            }
             tile = Tiles[y, x];
             return tile;
         }
 
-        /*public bool isPathClear(Tile startTile, Tile endTile)
+        public bool isInBounds(int x, int y)
         {
-            
-        }*/
+            if (x >= 0 && x < Width && y >= 0 && y < Length)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Chess
 
                             try
                             {
-                                selectedTile = board.tileAt(ToCoordinate(selectedTileString));
+                                selectedTile = board.tileAt(ToPosition(selectedTileString));
 
                                 if (selectedTile.OccupyingPiece != null)
                                 {
@@ -91,7 +91,8 @@ namespace Chess
 
                             try
                             {
-                                Tile moveTile = board.tileAt(ToCoordinate(moveString));
+                                Tile moveTile = board.tileAt(ToPosition(moveString));
+                                
                                 if (isValidMove(moveTile, selectedPiece))
                                 {
                                     selectedTile.OccupyingPiece = null;
@@ -131,9 +132,9 @@ namespace Chess
             return input;
         }
 
-        static Coordinate ToCoordinate(string input)
+        static Position ToPosition(string input)
         {
-            Coordinate coordinate;
+            Position position = new Position();
 
             if (input.Length == 2)
             {
@@ -143,28 +144,28 @@ namespace Chess
                 switch (letterCoordinate)
                 {
                     case 'a':
-                        coordinate.x = 0;
+                        position.X = 0;
                         break;
                     case 'b':
-                        coordinate.x = 1;
+                        position.X = 1;
                         break;
                     case 'c':
-                        coordinate.x = 2;
+                        position.X = 2;
                         break;
                     case 'd':
-                        coordinate.x = 3;
+                        position.X = 3;
                         break;
                     case 'e':
-                        coordinate.x = 4;
+                        position.X = 4;
                         break;
                     case 'f':
-                        coordinate.x = 5;
+                        position.X = 5;
                         break;
                     case 'g':
-                        coordinate.x = 6;
+                        position.X = 6;
                         break;
                     case 'h':
-                        coordinate.x = 7;
+                        position.X = 7;
                         break;
                     default:
                         throw new InvalidCoordinateInput(input);
@@ -173,35 +174,35 @@ namespace Chess
                 switch (numberCoordinate)
                 {
                     case '1':
-                        coordinate.y = 7;
+                        position.Y = 7;
                         break;
                     case '2':
-                        coordinate.y = 6;
+                        position.Y = 6;
                         break;
                     case '3':
-                        coordinate.y = 5;
+                        position.Y = 5;
                         break;
                     case '4':
-                        coordinate.y = 4;
+                        position.Y = 4;
                         break;
                     case '5':
-                        coordinate.y = 3;
+                        position.Y = 3;
                         break;
                     case '6':
-                        coordinate.y = 2;
+                        position.Y = 2;
                         break;
                     case '7':
-                        coordinate.y = 1;
+                        position.Y = 1;
                         break;
 
                     case '8':
-                        coordinate.y = 0;
+                        position.Y = 0;
                         break;
                     default:
                         throw new InvalidCoordinateInput(input);
                 }
 
-                return coordinate;
+                return position;
             }
             else
             {
@@ -211,50 +212,33 @@ namespace Chess
 
         static bool isValidMove(Tile moveTile, Piece selectedPiece)
         {
-            List<Tile> possibleMoveTiles = new List<Tile>();
             List<Tile> validMoveTiles = new List<Tile>();
 
             switch (selectedPiece.PieceType)
             {
                 case PieceType.Pawn:
-                    if (!selectedPiece.HasMoved)
+                    //search for north moves
+                    for (int i = 1; selectedPiece.HasMoved && i < 2 || !selectedPiece.HasMoved && i < 3; i++)
                     {
-                        // store extra move in possible move tiles
-                        try
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
-                            possibleMoveTiles.Add(board.tileAt(selectedPiece.OccupiedTile.Position.X, selectedPiece.OccupiedTile.Position.Y - 2));
+                            break;
                         }
-                        catch (TileOutOfBounds ex)
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
                         {
-                            Console.WriteLine(ex.Message);
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
                         }
-                    }
-                    //store possible moves
-                    try
-                    {
-                        possibleMoveTiles.Add(board.tileAt(selectedPiece.OccupiedTile.Position.X, selectedPiece.OccupiedTile.Position.Y - 1));
-                    }
-                    catch (TileOutOfBounds ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
 
-                    foreach(Tile t in possibleMoveTiles)
-                    {
-                        /*if (!t.isOccupied() && board.isPathClear(selectedPiece.OccupiedTile, t))
-                        {
-                            validMoveTiles.Add(t);
-                        }*/
-
-                        if (!t.isOccupied())
-                        {
-                            validMoveTiles.Add(t);
-                        }
-                    }
-
-                    if (validMoveTiles.Count == 0)
-                    {
-                        return false;
+                        validMoveTiles.Add(possibleMoveTile);
                     }
 
                     foreach (Tile t in validMoveTiles)
@@ -265,29 +249,504 @@ namespace Chess
                         }
                     }
 
-                    // moveTile is not a valid move
                     return false;
-
                 case PieceType.Rook:
+                    //search for west moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+                        
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+                        
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+                        
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for north moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+                        
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for east moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+                        
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for south moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+                        
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 case PieceType.Knight:
+                    Position[] possibleMovePositionsKnight = 
+                    { 
+                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y + 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y + 1),
+                    };
+
+                    foreach (Position p in possibleMovePositionsKnight)
+                    {
+                        if (board.isInBounds(p.X, p.Y))
+                        {
+                            Tile possibleMoveTile = board.tileAt(p.X, p.Y);
+                            if (possibleMoveTile.isOccupied())
+                            {
+                                if (false) // if piece is enemy piece
+                                {
+                                    validMoveTiles.Add(possibleMoveTile);
+                                }
+                                break;
+                            }
+
+                            validMoveTiles.Add(possibleMoveTile);
+                        }
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 case PieceType.Bishop:
+                    // search for northwest moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for northeast moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for southeast moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for southwest moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 case PieceType.Queen:
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for north moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for east moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for south moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    // search for northwest moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for northeast moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for southeast moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    //search for southwest moves
+                    for (int i = 1; i < board.Length; i++)
+                    {
+                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        {
+                            break;
+                        }
+
+                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
+
+                        if (possibleMoveTile.isOccupied())
+                        {
+                            if (false) // if piece is enemy piece
+                            {
+                                validMoveTiles.Add(possibleMoveTile);
+                            }
+                            break;
+                        }
+
+                        validMoveTiles.Add(possibleMoveTile);
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 case PieceType.King:
+                    Position[] possibleMovePositionsKing =
+                    {
+                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y + 1),
+                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y + 1),
+                    };
+
+                    foreach (Position p in possibleMovePositionsKing)
+                    {
+                        if (board.isInBounds(p.X, p.Y))
+                        {
+                            Tile possibleMoveTile = board.tileAt(p.X, p.Y);
+                            if (possibleMoveTile.isOccupied())
+                            {
+                                if (false) // if piece is enemy piece
+                                {
+                                    validMoveTiles.Add(possibleMoveTile);
+                                }
+                                break;
+                            }
+
+                            validMoveTiles.Add(possibleMoveTile);
+                        }
+                    }
+
+                    foreach (Tile t in validMoveTiles)
+                    {
+                        if (t == moveTile)
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 default:
                     return false;
             }
         }
-    }
-
-    public struct Coordinate
-    {
-        public int x;
-        public int y;
     }
 
     [Serializable]
@@ -329,21 +788,6 @@ namespace Chess
         public NoPieceOnTile(string input)
         {
             InputString = input;
-        }
-    }
-
-    [Serializable]
-    public class TileOutOfBounds : Exception
-    { 
-        public string Message
-        {
-            get;
-            private set;
-        }
-
-        public TileOutOfBounds(int x, int y)
-        {
-            Message = "Tile at (" + x + ", " + y + ") is out of bounds";
         }
     }
 }

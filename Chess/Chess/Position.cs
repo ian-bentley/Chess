@@ -17,10 +17,12 @@ namespace Chess
             set;
         }
 
-        public Position()
+        public Position() : this(0, 0) { }
+
+        public Position(int x, int y)
         {
-            X = 0;
-            Y = 0;
+            X = x;
+            Y = y;
         }
     }
 }
