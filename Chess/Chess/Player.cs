@@ -4,6 +4,8 @@ using System.Text;
 
 namespace Chess
 {
+    public enum TurnState { SelectingPiece, SelectingMove, TurnOver }
+
     public class Player
     {
         public Piece QueenRook
@@ -87,13 +89,121 @@ namespace Chess
             private set;
         }
 
-        public Board Board
+        public Tile QueenRookStartTile
         {
             get;
-            private set;
+            set;
         }
 
-        public Player(Board board)
+        public Tile QueenKnightStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile QueenBishopStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile QueenStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile KingStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile KingBishopStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile KingKnightStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile KingRookStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile APawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile BPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile CPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile DPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile EPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile FPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile GPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public Tile HPawnStartTile
+        {
+            get;
+            set;
+        }
+
+        public TurnState TurnState
+        {
+            get;
+            set;
+        }
+
+        public Tile SelectedTile
+        {
+            get;
+            set;
+        }
+
+        public Piece SelectedPiece
+        {
+            get;
+            set;
+        }
+
+        public Player()
         {
             QueenRook = new Piece(PieceType.Rook, "Queen Rook");
             KingRook = new Piece(PieceType.Rook, "King Rook");
@@ -111,30 +221,78 @@ namespace Chess
             FPawn = new Piece(PieceType.Pawn, "F-Pawn");
             GPawn = new Piece(PieceType.Pawn, "G-Pawn");
             HPawn = new Piece(PieceType.Pawn, "H-Pawn");
-
-            Board = board;
-
-            SetUpPieces();
         }
 
-        public void SetUpPieces()
+        public bool HasPiece(Piece piece)
         {
-            QueenRook.Set(Board.QueenRookStartTile);
-            QueenKnight.Set(Board.QueenKnightStartTile);
-            QueenBishop.Set(Board.QueenBishopStartTile);
-            Queen.Set(Board.QueenStartTile);
-            King.Set(Board.KingStartTile);
-            KingBishop.Set(Board.KingBishopStartTile);
-            KingKnight.Set(Board.KingKnightStartTile);
-            KingRook.Set(Board.KingRookStartTile);
-            APawn.Set(Board.APawnStartTile);
-            BPawn.Set(Board.BPawnStartTile);
-            CPawn.Set(Board.CPawnStartTile);
-            DPawn.Set(Board.DPawnStartTile);
-            EPawn.Set(Board.EPawnStartTile);
-            FPawn.Set(Board.FPawnStartTile);
-            GPawn.Set(Board.GPawnStartTile);
-            HPawn.Set(Board.HPawnStartTile);
+            if (piece == QueenRook)
+            {
+                return true;
+            }
+            else if (piece == QueenKnight)
+            {
+                return true;
+            }
+            else if(piece == QueenBishop)
+            {
+                return true;
+            }
+            else if(piece == Queen)
+            {
+                return true;
+            }
+            else if(piece == King)
+            {
+                return true;
+            }
+            else if(piece == KingBishop)
+            {
+                return true;
+            }
+            else if(piece == KingKnight)
+            {
+                return true;
+            }
+            else if(piece == KingRook)
+            {
+                return true;
+            }
+            else if(piece == APawn)
+            {
+                return true;
+            }
+            else if(piece == BPawn)
+            {
+                return true;
+            }
+            else if(piece == CPawn)
+            {
+                return true;
+            }
+            else if(piece == DPawn)
+            {
+                return true;
+            }
+            else if(piece == EPawn)
+            {
+                return true;
+            }
+            else if(piece == FPawn)
+            {
+                return true;
+            }
+            else if(piece == GPawn)
+            {
+                return true;
+            }
+            else if(piece == HPawn)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

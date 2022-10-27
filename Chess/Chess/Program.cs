@@ -4,17 +4,22 @@ using System.Text;
 
 namespace Chess
 {
-    enum GameState { Start, PlayerTurn, Close }
-    enum TurnState { SelectingPiece, SelectingMove, TurnOver }
+    public enum GameState { Start, WhiteTurn, BlackTurn, Close }
     public class Program
     {
-        static Board board = new Board();
-        static Player player = new Player(board);
-        static GameState gameState = GameState.Start;
-        static string exitCommand = "-99";
-        static string backCommand = "-1";
+        static Board board;
+        static Player whitePlayer;
+        static Player blackPlayer;
+        static Player currentPlayer;
+        static GameState gameState;
+        const string exitCommand = "-99";
+        const string backCommand = "-1";
         static void Main(string[] args)
         {
+            board = new Board();
+            whitePlayer = new Player();
+            blackPlayer = new Player();
+            gameState = GameState.Start;
             Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.Clear();
             board.Draw();
@@ -27,95 +32,76 @@ namespace Chess
                 switch (gameState)
                 {
                     case GameState.Start:
-                        gameState = GameState.PlayerTurn;
+                        whitePlayer.QueenRookStartTile = board.Tiles[7, 0];
+                        whitePlayer.QueenKnightStartTile = board.Tiles[7, 1];
+                        whitePlayer.QueenBishopStartTile = board.Tiles[7, 2];
+                        whitePlayer.QueenStartTile = board.Tiles[7, 3];
+                        whitePlayer.KingStartTile = board.Tiles[7, 4];
+                        whitePlayer.KingBishopStartTile = board.Tiles[7, 5];
+                        whitePlayer.KingKnightStartTile = board.Tiles[7, 6];
+                        whitePlayer.KingRookStartTile = board.Tiles[7, 7];
+                        whitePlayer.APawnStartTile = board.Tiles[6, 0];
+                        whitePlayer.BPawnStartTile = board.Tiles[6, 1];
+                        whitePlayer.CPawnStartTile = board.Tiles[6, 2];
+                        whitePlayer.DPawnStartTile = board.Tiles[6, 3];
+                        whitePlayer.EPawnStartTile = board.Tiles[6, 4];
+                        whitePlayer.FPawnStartTile = board.Tiles[6, 5];
+                        whitePlayer.GPawnStartTile = board.Tiles[6, 6];
+                        whitePlayer.HPawnStartTile = board.Tiles[6, 7];
+
+                        blackPlayer.QueenRookStartTile = board.Tiles[0, 0];
+                        blackPlayer.QueenKnightStartTile = board.Tiles[0, 1];
+                        blackPlayer.QueenBishopStartTile = board.Tiles[0, 2];
+                        blackPlayer.QueenStartTile = board.Tiles[0, 3];
+                        blackPlayer.KingStartTile = board.Tiles[0, 4];
+                        blackPlayer.KingBishopStartTile = board.Tiles[0, 5];
+                        blackPlayer.KingKnightStartTile = board.Tiles[0, 6];
+                        blackPlayer.KingRookStartTile = board.Tiles[0, 7];
+                        blackPlayer.APawnStartTile = board.Tiles[1, 0];
+                        blackPlayer.BPawnStartTile = board.Tiles[1, 1];
+                        blackPlayer.CPawnStartTile = board.Tiles[1, 2];
+                        blackPlayer.DPawnStartTile = board.Tiles[1, 3];
+                        blackPlayer.EPawnStartTile = board.Tiles[1, 4];
+                        blackPlayer.FPawnStartTile = board.Tiles[1, 5];
+                        blackPlayer.GPawnStartTile = board.Tiles[1, 6];
+                        blackPlayer.HPawnStartTile = board.Tiles[1, 7];
+                        SetUpPieces();
+                        gameState = GameState.WhiteTurn;
                         break;
-                    case GameState.PlayerTurn:
-                        TurnState turnState = TurnState.SelectingPiece;
-                        Tile selectedTile = new Tile();
-                        Piece selectedPiece = new Piece();
-
-                        while (turnState == TurnState.SelectingPiece)
+                    case GameState.WhiteTurn:
+                        currentPlayer = whitePlayer;
+                        whitePlayer.TurnState = TurnState.SelectingPiece;
+                        while (whitePlayer.TurnState == TurnState.SelectingPiece)
                         {
-                            Console.Clear();
-                            board.Draw();
-                            string selectedTileString = GetInput("Select a piece: ");
-
-                            if (selectedTileString == exitCommand)
-                            {
-                                turnState = TurnState.TurnOver;
-                                gameState = GameState.Close;
-                                continue;
-                            }
-
-                            try
-                            {
-                                selectedTile = board.tileAt(ToPosition(selectedTileString));
-
-                                if (selectedTile.OccupyingPiece != null)
-                                {
-                                    turnState = TurnState.SelectingMove;
-                                }
-                                else
-                                {
-                                    throw new NoPieceOnTile(selectedTileString);
-                                }
-                            }
-                            catch (InvalidCoordinateInput ex)
-                            {
-                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
-                                Console.Write("Press any key to continue...");
-                                Console.ReadKey();
-                            }
-                            catch (NoPieceOnTile ex)
-                            {
-                                Console.WriteLine("No piece is on " + "\"" + ex.InputString + "\"");
-                                Console.Write("Press any key to continue...");
-                                Console.ReadKey();
-                            }
+                            SelectPiece();
                         }
 
-                        while (turnState == TurnState.SelectingMove)
+                        while (whitePlayer.TurnState == TurnState.SelectingMove)
                         {
-                            selectedPiece = selectedTile.OccupyingPiece;
+                            SelectMove();
+                        }
 
-                            Console.Clear();
-                            board.Draw();
-                            Console.WriteLine("You selected the " + selectedPiece.Name);
-                            string moveString = GetInput("Enter your move: ");
+                        if (gameState != GameState.Close)
+                        {
+                            gameState = GameState.BlackTurn;
+                        }
+                        break;
+                    case GameState.BlackTurn:
+                        currentPlayer = blackPlayer;
+                        blackPlayer.TurnState = TurnState.SelectingPiece;
+                        while (blackPlayer.TurnState == TurnState.SelectingPiece)
+                        {
+                            SelectPiece();
+                        }
 
-                            if (moveString == backCommand)
-                            {
-                                turnState = TurnState.SelectingPiece;
-                                continue;
-                            }
+                        while (blackPlayer.TurnState == TurnState.SelectingMove)
+                        {
+                            SelectMove();
+                        }
 
-                            try
-                            {
-                                Tile moveTile = board.tileAt(ToPosition(moveString));
-                                
-                                if (isValidMove(moveTile, selectedPiece))
-                                {
-                                    selectedTile.OccupyingPiece = null;
-                                    selectedPiece.MoveTo(moveTile);
-                                    turnState = TurnState.TurnOver;
-                                }
-                                else
-                                {
-                                    throw new InvalidMove(moveString);
-                                }
-                            }
-                            catch (InvalidCoordinateInput ex)
-                            {
-                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
-                                Console.Write("Press any key to continue...");
-                                Console.ReadKey();
-                            }
-                            catch (InvalidMove ex)
-                            {
-                                Console.WriteLine("\"" + ex.InputString + "\" is not a valid move");
-                                Console.Write("Press any key to continue...");
-                                Console.ReadKey();
-                            }
+                        if (gameState != GameState.Close)
+                        {
+                            gameState = GameState.WhiteTurn;
                         }
                         break;
                 }
@@ -210,52 +196,75 @@ namespace Chess
             }
         }
 
-        static bool isValidMove(Tile moveTile, Piece selectedPiece)
+        static bool isValidMove(Tile moveTile)
         {
             List<Tile> validMoveTiles = new List<Tile>();
 
-            switch (selectedPiece.PieceType)
+            switch (currentPlayer.SelectedPiece.PieceType)
             {
                 case PieceType.Pawn:
-                    //search for north moves
-                    for (int i = 1; selectedPiece.HasMoved && i < 2 || !selectedPiece.HasMoved && i < 3; i++)
+                    if (currentPlayer == whitePlayer)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
-                        if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
+                        List<Position> possibleMovePositionsPawn = new List<Position>();
+                        if (!board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1).isOccupied())
                         {
-                            break;
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
                         }
 
-                        Tile possibleMoveTile = board.tileAt(possibleMoveTileX, possibleMoveTileY);
-
-                        if (possibleMoveTile.isOccupied())
+                        if (!currentPlayer.SelectedPiece.HasMoved && !board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 2).isOccupied())
                         {
-                            if (false) // if piece is enemy piece
-                            {
-                                validMoveTiles.Add(possibleMoveTile);
-                            }
-                            break;
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 2));
                         }
 
-                        validMoveTiles.Add(possibleMoveTile);
-                    }
-
-                    foreach (Tile t in validMoveTiles)
-                    {
-                        if (t == moveTile)
+                        if (board.isInBounds(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1) 
+                            && board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1).isOccupied() 
+                            && !currentPlayer.HasPiece(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1).OccupyingPiece))
                         {
-                            return true;
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                        }
+
+                        if (board.isInBounds(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1)
+                            && board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1).isOccupied()
+                            && !currentPlayer.HasPiece(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1).OccupyingPiece))
+                        {
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
                         }
                     }
+                    else if (currentPlayer == blackPlayer)
+                    {
+                        List<Position> possibleMovePositionsPawn = new List<Position>();
+                        if (!board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).isOccupied())
+                        {
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
+                        }
 
-                    return false;
+                        if (!currentPlayer.SelectedPiece.HasMoved && !board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 2).isOccupied())
+                        {
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 2));
+                        }
+
+                        if (board.isInBounds(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1)
+                            && board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).isOccupied()
+                            && !currentPlayer.HasPiece(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).OccupyingPiece))
+                        {
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                        }
+
+                        if (board.isInBounds(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1)
+                            && board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).isOccupied()
+                            && !currentPlayer.HasPiece(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).OccupyingPiece))
+                        {
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
+                        }
+                    }
+
+                    break;
                 case PieceType.Rook:
                     //search for west moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -265,7 +274,7 @@ namespace Chess
                         
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -278,8 +287,8 @@ namespace Chess
                     //search for north moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -289,7 +298,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -302,8 +311,8 @@ namespace Chess
                     //search for east moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -313,7 +322,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -326,8 +335,8 @@ namespace Chess
                     //search for south moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -337,7 +346,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -347,26 +356,18 @@ namespace Chess
                         validMoveTiles.Add(possibleMoveTile);
                     }
 
-                    foreach (Tile t in validMoveTiles)
-                    {
-                        if (t == moveTile)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
+                    break;
                 case PieceType.Knight:
                     Position[] possibleMovePositionsKnight = 
                     { 
-                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y - 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y - 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y - 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y - 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y + 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y + 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y + 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y + 1),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 2, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 2),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 2, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 2, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 2),
+                        new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 2, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1),
                     };
 
                     foreach (Position p in possibleMovePositionsKnight)
@@ -376,32 +377,23 @@ namespace Chess
                             Tile possibleMoveTile = board.tileAt(p.X, p.Y);
                             if (possibleMoveTile.isOccupied())
                             {
-                                if (false) // if piece is enemy piece
+                                if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                                 {
                                     validMoveTiles.Add(possibleMoveTile);
                                 }
-                                break;
                             }
 
                             validMoveTiles.Add(possibleMoveTile);
                         }
                     }
 
-                    foreach (Tile t in validMoveTiles)
-                    {
-                        if (t == moveTile)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
+                    break;
                 case PieceType.Bishop:
                     // search for northwest moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -411,7 +403,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -424,8 +416,8 @@ namespace Chess
                     //search for northeast moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -435,7 +427,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -448,8 +440,8 @@ namespace Chess
                     //search for southeast moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -459,7 +451,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -472,8 +464,8 @@ namespace Chess
                     //search for southwest moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -483,7 +475,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -493,20 +485,12 @@ namespace Chess
                         validMoveTiles.Add(possibleMoveTile);
                     }
 
-                    foreach (Tile t in validMoveTiles)
-                    {
-                        if (t == moveTile)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
+                    break;
                 case PieceType.Queen:
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -516,7 +500,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -529,8 +513,8 @@ namespace Chess
                     //search for north moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -540,7 +524,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -553,8 +537,8 @@ namespace Chess
                     //search for east moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -564,7 +548,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -577,8 +561,8 @@ namespace Chess
                     //search for south moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -588,7 +572,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -601,8 +585,8 @@ namespace Chess
                     // search for northwest moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -612,7 +596,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -625,8 +609,8 @@ namespace Chess
                     //search for northeast moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y - i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y - i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -636,7 +620,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -649,8 +633,8 @@ namespace Chess
                     //search for southeast moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X + i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X + i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -660,7 +644,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -673,8 +657,8 @@ namespace Chess
                     //search for southwest moves
                     for (int i = 1; i < board.Length; i++)
                     {
-                        int possibleMoveTileX = selectedPiece.OccupiedTile.Position.X - i;
-                        int possibleMoveTileY = selectedPiece.OccupiedTile.Position.Y + i;
+                        int possibleMoveTileX = currentPlayer.SelectedPiece.OccupiedTile.Position.X - i;
+                        int possibleMoveTileY = currentPlayer.SelectedPiece.OccupiedTile.Position.Y + i;
                         if (!board.isInBounds(possibleMoveTileX, possibleMoveTileY))
                         {
                             break;
@@ -684,7 +668,7 @@ namespace Chess
 
                         if (possibleMoveTile.isOccupied())
                         {
-                            if (false) // if piece is enemy piece
+                            if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                             {
                                 validMoveTiles.Add(possibleMoveTile);
                             }
@@ -694,27 +678,30 @@ namespace Chess
                         validMoveTiles.Add(possibleMoveTile);
                     }
 
-                    foreach (Tile t in validMoveTiles)
+                    break;
+                case PieceType.King:
+                    List<Position> possibleMovePositionsKing = new List<Position>();
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
+                    possibleMovePositionsKing.Add(new Position(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
+
+                    if (!currentPlayer.SelectedPiece.HasMoved)
                     {
-                        if (t == moveTile)
+                        if (!currentPlayer.KingBishopStartTile.isOccupied() && !currentPlayer.KingKnightStartTile.isOccupied() && !currentPlayer.KingRook.HasMoved) //kingside castling
                         {
-                            return true;
+                            validMoveTiles.Add(currentPlayer.KingKnightStartTile);
+                        }
+
+                        if (!currentPlayer.QueenBishopStartTile.isOccupied() && !currentPlayer.QueenKnightStartTile.isOccupied() && !currentPlayer.QueenStartTile.isOccupied() && !currentPlayer.QueenRook.HasMoved) //queenside castling
+                        {
+                            validMoveTiles.Add(currentPlayer.QueenBishopStartTile);
                         }
                     }
-
-                    return false;
-                case PieceType.King:
-                    Position[] possibleMovePositionsKing =
-                    {
-                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y - 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y - 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y - 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y - 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 2, selectedPiece.OccupiedTile.Position.Y + 1),
-                        new Position(selectedPiece.OccupiedTile.Position.X + 1, selectedPiece.OccupiedTile.Position.Y + 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 1, selectedPiece.OccupiedTile.Position.Y + 2),
-                        new Position(selectedPiece.OccupiedTile.Position.X - 2, selectedPiece.OccupiedTile.Position.Y + 1),
-                    };
 
                     foreach (Position p in possibleMovePositionsKing)
                     {
@@ -723,28 +710,171 @@ namespace Chess
                             Tile possibleMoveTile = board.tileAt(p.X, p.Y);
                             if (possibleMoveTile.isOccupied())
                             {
-                                if (false) // if piece is enemy piece
+                                if (!currentPlayer.HasPiece(possibleMoveTile.OccupyingPiece)) // if piece is enemy piece
                                 {
                                     validMoveTiles.Add(possibleMoveTile);
                                 }
-                                break;
                             }
 
                             validMoveTiles.Add(possibleMoveTile);
                         }
                     }
+                    break;
+                default:
+                    break;
+            }
 
-                    foreach (Tile t in validMoveTiles)
+            foreach (Tile t in validMoveTiles)
+            {
+                if (t == moveTile)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void SetUpPieces()
+        {
+            whitePlayer.QueenRook.Set(whitePlayer.QueenRookStartTile);
+            whitePlayer.QueenKnight.Set(whitePlayer.QueenKnightStartTile);
+            whitePlayer.QueenBishop.Set(whitePlayer.QueenBishopStartTile);
+            whitePlayer.Queen.Set(whitePlayer.QueenStartTile);
+            whitePlayer.King.Set(whitePlayer.KingStartTile);
+            whitePlayer.KingBishop.Set(whitePlayer.KingBishopStartTile);
+            whitePlayer.KingKnight.Set(whitePlayer.KingKnightStartTile);
+            whitePlayer.KingRook.Set(whitePlayer.KingRookStartTile);
+            whitePlayer.APawn.Set(whitePlayer.APawnStartTile);
+            whitePlayer.BPawn.Set(whitePlayer.BPawnStartTile);
+            whitePlayer.CPawn.Set(whitePlayer.CPawnStartTile);
+            whitePlayer.DPawn.Set(whitePlayer.DPawnStartTile);
+            whitePlayer.EPawn.Set(whitePlayer.EPawnStartTile);
+            whitePlayer.FPawn.Set(whitePlayer.FPawnStartTile);
+            whitePlayer.GPawn.Set(whitePlayer.GPawnStartTile);
+            whitePlayer.HPawn.Set(whitePlayer.HPawnStartTile);
+
+            blackPlayer.QueenRook.Set(blackPlayer.QueenRookStartTile);
+            blackPlayer.QueenKnight.Set(blackPlayer.QueenKnightStartTile);
+            blackPlayer.QueenBishop.Set(blackPlayer.QueenBishopStartTile);
+            blackPlayer.Queen.Set(blackPlayer.QueenStartTile);
+            blackPlayer.King.Set(blackPlayer.KingStartTile);
+            blackPlayer.KingBishop.Set(blackPlayer.KingBishopStartTile);
+            blackPlayer.KingKnight.Set(blackPlayer.KingKnightStartTile);
+            blackPlayer.KingRook.Set(blackPlayer.KingRookStartTile);
+            blackPlayer.APawn.Set(blackPlayer.APawnStartTile);
+            blackPlayer.BPawn.Set(blackPlayer.BPawnStartTile);
+            blackPlayer.CPawn.Set(blackPlayer.CPawnStartTile);
+            blackPlayer.DPawn.Set(blackPlayer.DPawnStartTile);
+            blackPlayer.EPawn.Set(blackPlayer.EPawnStartTile);
+            blackPlayer.FPawn.Set(blackPlayer.FPawnStartTile);
+            blackPlayer.GPawn.Set(blackPlayer.GPawnStartTile);
+            blackPlayer.HPawn.Set(blackPlayer.HPawnStartTile);
+        }
+
+        public static void SelectPiece()
+        {
+            Console.Clear();
+            board.Draw();
+            string selectedTileString = GetInput("Select a piece: ");
+
+            if (selectedTileString == exitCommand)
+            {
+                currentPlayer.TurnState = TurnState.TurnOver;
+                gameState = GameState.Close;
+                return;
+            }
+
+            try
+            {
+                currentPlayer.SelectedTile = board.tileAt(ToPosition(selectedTileString));
+
+                if (currentPlayer.SelectedTile.OccupyingPiece != null)
+                {
+                    currentPlayer.SelectedPiece = currentPlayer.SelectedTile.OccupyingPiece;
+                    if (currentPlayer.HasPiece(currentPlayer.SelectedPiece))
                     {
-                        if (t == moveTile)
+                        currentPlayer.TurnState = TurnState.SelectingMove;
+                    }
+                    else
+                    {
+                        throw new InvalidPiece(selectedTileString);
+                    }
+                }
+                else
+                {
+                    throw new NoPieceOnTile(selectedTileString);
+                }
+            }
+            catch (InvalidCoordinateInput ex)
+            {
+                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
+            }
+            catch (NoPieceOnTile ex)
+            {
+                Console.WriteLine("No piece is on " + "\"" + ex.InputString + "\"");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
+            }
+            catch (InvalidPiece ex)
+            {
+                Console.WriteLine("\"" + ex.InputString + "\"" + " is not your piece");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
+            }
+        }
+
+        public static void SelectMove()
+        {
+            Console.Clear();
+            board.Draw();
+            Console.WriteLine("You selected the " + currentPlayer.SelectedPiece.Name);
+            string moveString = GetInput("Enter your move: ");
+
+            if (moveString == backCommand)
+            {
+                currentPlayer.TurnState = TurnState.SelectingPiece;
+                return;
+            }
+
+            try
+            {
+                Tile moveTile = board.tileAt(ToPosition(moveString));
+
+                if (isValidMove(moveTile))
+                {
+                    if (currentPlayer.SelectedPiece.PieceType == PieceType.King && !currentPlayer.SelectedPiece.HasMoved)
+                    {
+                        if (moveTile == currentPlayer.KingKnightStartTile)
                         {
-                            return true;
+                            currentPlayer.KingRook.MoveTo(currentPlayer.KingBishopStartTile);
+                        }
+                        else if (moveTile == currentPlayer.QueenBishopStartTile)
+                        {
+                            currentPlayer.KingRook.MoveTo(currentPlayer.QueenStartTile);
                         }
                     }
-
-                    return false;
-                default:
-                    return false;
+                    currentPlayer.SelectedPiece.MoveTo(moveTile);
+                    currentPlayer.TurnState = TurnState.TurnOver;
+                }
+                else
+                {
+                    throw new InvalidMove(moveString);
+                }
+            }
+            catch (InvalidCoordinateInput ex)
+            {
+                Console.WriteLine("\"" + ex.InputString + "\" is not a valid input");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
+            }
+            catch (InvalidMove ex)
+            {
+                Console.WriteLine("\"" + ex.InputString + "\" is not a valid move");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
             }
         }
     }
@@ -786,6 +916,21 @@ namespace Chess
         }
 
         public NoPieceOnTile(string input)
+        {
+            InputString = input;
+        }
+    }
+
+    [Serializable]
+    public class InvalidPiece : Exception
+    {
+        public string InputString
+        {
+            get;
+            private set;
+        }
+
+        public InvalidPiece(string input)
         {
             InputString = input;
         }

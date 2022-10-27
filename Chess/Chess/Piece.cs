@@ -79,6 +79,7 @@ namespace Chess
                 HasMoved = true;
             }
             tile.OccupyingPiece = this;
+            OccupiedTile.OccupyingPiece = null;
             OccupiedTile = tile;
         }
 
