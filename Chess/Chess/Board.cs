@@ -50,7 +50,16 @@ namespace Chess
                 for (int j = 0; j < Width; j++)
                 {
                     Console.Write("[");
-                    Console.Write(Tiles[i, j].getTileIcon());
+                    if (Program.BlackPlayer.HasPiece(Tiles[i, j].OccupyingPiece))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.Write(Tiles[i, j].getTileIcon());
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        Console.Write(Tiles[i, j].getTileIcon());
+                    }
                     Console.Write("]");
                 }
                 Console.Write("\n");

@@ -5,11 +5,15 @@ using System.Text;
 namespace Chess
 {
     public enum GameState { Start, WhiteTurn, BlackTurn, Close }
-    public class Program
+    public static class Program
     {
         static Board board;
         static Player whitePlayer;
-        static Player blackPlayer;
+        static public Player BlackPlayer
+        {
+            get;
+            private set;
+        }
         static Player currentPlayer;
         static GameState gameState;
         const string exitCommand = "-99";
@@ -18,7 +22,7 @@ namespace Chess
         {
             board = new Board();
             whitePlayer = new Player();
-            blackPlayer = new Player();
+            BlackPlayer = new Player();
             gameState = GameState.Start;
             Console.BackgroundColor = ConsoleColor.DarkGreen;
             Console.Clear();
@@ -49,22 +53,22 @@ namespace Chess
                         whitePlayer.GPawnStartTile = board.Tiles[6, 6];
                         whitePlayer.HPawnStartTile = board.Tiles[6, 7];
 
-                        blackPlayer.QueenRookStartTile = board.Tiles[0, 0];
-                        blackPlayer.QueenKnightStartTile = board.Tiles[0, 1];
-                        blackPlayer.QueenBishopStartTile = board.Tiles[0, 2];
-                        blackPlayer.QueenStartTile = board.Tiles[0, 3];
-                        blackPlayer.KingStartTile = board.Tiles[0, 4];
-                        blackPlayer.KingBishopStartTile = board.Tiles[0, 5];
-                        blackPlayer.KingKnightStartTile = board.Tiles[0, 6];
-                        blackPlayer.KingRookStartTile = board.Tiles[0, 7];
-                        blackPlayer.APawnStartTile = board.Tiles[1, 0];
-                        blackPlayer.BPawnStartTile = board.Tiles[1, 1];
-                        blackPlayer.CPawnStartTile = board.Tiles[1, 2];
-                        blackPlayer.DPawnStartTile = board.Tiles[1, 3];
-                        blackPlayer.EPawnStartTile = board.Tiles[1, 4];
-                        blackPlayer.FPawnStartTile = board.Tiles[1, 5];
-                        blackPlayer.GPawnStartTile = board.Tiles[1, 6];
-                        blackPlayer.HPawnStartTile = board.Tiles[1, 7];
+                        BlackPlayer.QueenRookStartTile = board.Tiles[0, 0];
+                        BlackPlayer.QueenKnightStartTile = board.Tiles[0, 1];
+                        BlackPlayer.QueenBishopStartTile = board.Tiles[0, 2];
+                        BlackPlayer.QueenStartTile = board.Tiles[0, 3];
+                        BlackPlayer.KingStartTile = board.Tiles[0, 4];
+                        BlackPlayer.KingBishopStartTile = board.Tiles[0, 5];
+                        BlackPlayer.KingKnightStartTile = board.Tiles[0, 6];
+                        BlackPlayer.KingRookStartTile = board.Tiles[0, 7];
+                        BlackPlayer.APawnStartTile = board.Tiles[1, 0];
+                        BlackPlayer.BPawnStartTile = board.Tiles[1, 1];
+                        BlackPlayer.CPawnStartTile = board.Tiles[1, 2];
+                        BlackPlayer.DPawnStartTile = board.Tiles[1, 3];
+                        BlackPlayer.EPawnStartTile = board.Tiles[1, 4];
+                        BlackPlayer.FPawnStartTile = board.Tiles[1, 5];
+                        BlackPlayer.GPawnStartTile = board.Tiles[1, 6];
+                        BlackPlayer.HPawnStartTile = board.Tiles[1, 7];
                         SetUpPieces();
                         gameState = GameState.WhiteTurn;
                         break;
@@ -87,14 +91,14 @@ namespace Chess
                         }
                         break;
                     case GameState.BlackTurn:
-                        currentPlayer = blackPlayer;
-                        blackPlayer.TurnState = TurnState.SelectingPiece;
-                        while (blackPlayer.TurnState == TurnState.SelectingPiece)
+                        currentPlayer = BlackPlayer;
+                        BlackPlayer.TurnState = TurnState.SelectingPiece;
+                        while (BlackPlayer.TurnState == TurnState.SelectingPiece)
                         {
                             SelectPiece();
                         }
 
-                        while (blackPlayer.TurnState == TurnState.SelectingMove)
+                        while (BlackPlayer.TurnState == TurnState.SelectingMove)
                         {
                             SelectMove();
                         }
@@ -230,7 +234,7 @@ namespace Chess
                             validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
                         }
                     }
-                    else if (currentPlayer == blackPlayer)
+                    else if (currentPlayer == BlackPlayer)
                     {
                         List<Position> possibleMovePositionsPawn = new List<Position>();
                         if (!board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).isOccupied())
@@ -247,7 +251,7 @@ namespace Chess
                             && board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).isOccupied()
                             && !currentPlayer.HasPiece(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1).OccupyingPiece))
                         {
-                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y - 1));
+                            validMoveTiles.Add(board.tileAt(currentPlayer.SelectedPiece.OccupiedTile.Position.X - 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1));
                         }
 
                         if (board.isInBounds(currentPlayer.SelectedPiece.OccupiedTile.Position.X + 1, currentPlayer.SelectedPiece.OccupiedTile.Position.Y + 1)
@@ -754,22 +758,22 @@ namespace Chess
             whitePlayer.GPawn.Set(whitePlayer.GPawnStartTile);
             whitePlayer.HPawn.Set(whitePlayer.HPawnStartTile);
 
-            blackPlayer.QueenRook.Set(blackPlayer.QueenRookStartTile);
-            blackPlayer.QueenKnight.Set(blackPlayer.QueenKnightStartTile);
-            blackPlayer.QueenBishop.Set(blackPlayer.QueenBishopStartTile);
-            blackPlayer.Queen.Set(blackPlayer.QueenStartTile);
-            blackPlayer.King.Set(blackPlayer.KingStartTile);
-            blackPlayer.KingBishop.Set(blackPlayer.KingBishopStartTile);
-            blackPlayer.KingKnight.Set(blackPlayer.KingKnightStartTile);
-            blackPlayer.KingRook.Set(blackPlayer.KingRookStartTile);
-            blackPlayer.APawn.Set(blackPlayer.APawnStartTile);
-            blackPlayer.BPawn.Set(blackPlayer.BPawnStartTile);
-            blackPlayer.CPawn.Set(blackPlayer.CPawnStartTile);
-            blackPlayer.DPawn.Set(blackPlayer.DPawnStartTile);
-            blackPlayer.EPawn.Set(blackPlayer.EPawnStartTile);
-            blackPlayer.FPawn.Set(blackPlayer.FPawnStartTile);
-            blackPlayer.GPawn.Set(blackPlayer.GPawnStartTile);
-            blackPlayer.HPawn.Set(blackPlayer.HPawnStartTile);
+            BlackPlayer.QueenRook.Set(BlackPlayer.QueenRookStartTile);
+            BlackPlayer.QueenKnight.Set(BlackPlayer.QueenKnightStartTile);
+            BlackPlayer.QueenBishop.Set(BlackPlayer.QueenBishopStartTile);
+            BlackPlayer.Queen.Set(BlackPlayer.QueenStartTile);
+            BlackPlayer.King.Set(BlackPlayer.KingStartTile);
+            BlackPlayer.KingBishop.Set(BlackPlayer.KingBishopStartTile);
+            BlackPlayer.KingKnight.Set(BlackPlayer.KingKnightStartTile);
+            BlackPlayer.KingRook.Set(BlackPlayer.KingRookStartTile);
+            BlackPlayer.APawn.Set(BlackPlayer.APawnStartTile);
+            BlackPlayer.BPawn.Set(BlackPlayer.BPawnStartTile);
+            BlackPlayer.CPawn.Set(BlackPlayer.CPawnStartTile);
+            BlackPlayer.DPawn.Set(BlackPlayer.DPawnStartTile);
+            BlackPlayer.EPawn.Set(BlackPlayer.EPawnStartTile);
+            BlackPlayer.FPawn.Set(BlackPlayer.FPawnStartTile);
+            BlackPlayer.GPawn.Set(BlackPlayer.GPawnStartTile);
+            BlackPlayer.HPawn.Set(BlackPlayer.HPawnStartTile);
         }
 
         public static void SelectPiece()
